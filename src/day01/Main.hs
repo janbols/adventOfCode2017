@@ -1,6 +1,14 @@
-module Day01 (inverseCaptcha) where
+module Main where
 
 import Data.Char
+
+
+main :: IO ()
+main = do
+  _ <- putStrLn "Input..."
+  input <- getLine
+  print $ inverseCaptcha input
+
 
 inverseCaptcha :: String -> Int
 inverseCaptcha cs = doInverseCaptcha (length cs `quot` 2) cs
