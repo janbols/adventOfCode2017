@@ -1,30 +1,39 @@
+{-# LANGUAGE ScopedTypeVariables #-}
 module Main where
 
 import Data.Char
-
+import Data.List
+import Data.Maybe
 
 main :: IO ()
 main = do
   _ <- putStrLn "Input..."
-  input <- getLine
-  print $ inverseCaptcha input
+  interact (show . corruptionChecksumEvenDivide . parseMatrix)
 
 
-inverseCaptcha :: String -> Int
-inverseCaptcha cs = doInverseCaptcha (length cs `quot` 2) cs
---inverseCaptcha cs = doInverseCaptcha 1 cs
+parseMatrix :: String -> [[Int]]
+parseMatrix = fmap parseRow . lines
 
+parseRow :: String -> [Int]
+parseRow = fmap read . words
 
-doInverseCaptcha :: Int -> String -> Int
-doInverseCaptcha dropCnt cs =
-  let xs = withPeek dropCnt (map digitToInt cs)
-  in xs -: filter pairMatches -: map fst -: sum
+--part 1
+corruptionChecksumMinMax :: [[Int]] -> Int
+corruptionChecksumMinMax = sum . fmap minMaxDiff
 
-withPeek:: Int -> [a]-> [(a,a)]
-withPeek dropCnt xs = zip xs $ drop dropCnt $ cycle xs
+minMaxDiff :: [Int] -> Int
+minMaxDiff xs = maximum xs - minimum xs
 
-pairMatches :: Eq a => (a,a) -> Bool
-pairMatches = uncurry (==)
+--part 2
+corruptionChecksumEvenDivide :: [[Int]] -> Int
+corruptionChecksumEvenDivide = sum . fmap evenDivide
 
-(-:) :: a -> ( a -> b ) -> b
-x -: f = f x
+isEvenlyDivided:: Int -> Int -> Bool
+isEvenlyDivided x y = (x /= y) && (x `mod` y == 0)
+
+evenDivide :: [Int] -> Int
+evenDivide xs =
+  let combinations = [(x,y) | x <- xs, y <-xs, x /= y]
+  in case find (uncurry isEvenlyDivided) combinations of
+    Just (x,y) -> max x y `div` min x y
+    Nothing -> 0
