@@ -1,22 +1,24 @@
 module Main where
 
 import Data.Char
-
+import Utils
 
 main :: IO ()
 main = do
-  _ <- putStrLn "Input..."
-  input <- getLine
-  print $ inverseCaptcha input
+  ptNr <- partSelection
+  input <- requestInput
+  if ptNr == 1 then print $ pt1 input
+    else print $ pt2 input
 
 
-inverseCaptcha :: String -> Int
-inverseCaptcha cs = doInverseCaptcha (length cs `quot` 2) cs
---inverseCaptcha cs = doInverseCaptcha 1 cs
+pt1 :: String -> Int
+pt1 = inverseCaptcha 1
 
+pt2 :: String -> Int
+pt2 cs = inverseCaptcha (length cs `quot` 2) cs
 
-doInverseCaptcha :: Int -> String -> Int
-doInverseCaptcha dropCnt cs =
+inverseCaptcha :: Int -> String -> Int
+inverseCaptcha dropCnt cs =
   let xs = withPeek dropCnt (map digitToInt cs)
   in xs -: filter pairMatches -: map fst -: sum
 
